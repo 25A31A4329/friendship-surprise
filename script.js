@@ -889,3 +889,43 @@
   });
 
 })();
+// ================= MUSIC PLAYER =================
+
+const bgMusic = document.getElementById("bg-music");
+const beginBtn = document.getElementById("begin-btn");
+
+if (bgMusic) {
+    bgMusic.volume = 0.5;
+}
+
+// Play music after user clicks Begin
+if (beginBtn && bgMusic) {
+    beginBtn.addEventListener("click", function () {
+
+        bgMusic.play().then(() => {
+            console.log("Music Playing");
+        }).catch((err)=>{
+            console.log(err);
+        });
+
+    });
+}
+
+// Keyboard shortcut (M) Play/Pause
+document.addEventListener("keydown",function(e){
+
+    if(e.key==="m" || e.key==="M"){
+
+        if(bgMusic.paused){
+
+            bgMusic.play();
+
+        }else{
+
+            bgMusic.pause();
+
+        }
+
+    }
+
+});
