@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Roohiiiiiiiii &mdash; Our Story</title>
+  <meta name="description" content="A cinematic Friendship Day journey, handcrafted for Roohiiiiiiiii.">
+
+  <!-- ============ GOOGLE FONTS ============ -->
+  <!-- Playfair Display: cinematic serif for headings -->
+  <!-- Great Vibes: script accent for names & signature lines -->
+  <!-- Quicksand: soft rounded body copy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,600&family=Great+Vibes&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- ============ AOS (Animate On Scroll) ============ -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
+  <!-- ============ STYLES ============ -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Favicon (optional heart icon placeholder) -->
+  <link rel="icon" href="assets/icons/favicon.png" type="image/png">
+</head>
+<body>
+
+  <!-- ======================================================
+       AMBIENT LAYERS (persist across the entire experience)
+       ====================================================== -->
+
+  <!-- Animated night-sky gradient sits at the very back -->
+  <div class="sky-gradient" aria-hidden="true"></div>
+
+  <!-- Canvas layers for stars / fireflies / floating hearts / sparkles -->
+  <canvas id="canvas-stars" aria-hidden="true"></canvas>
+  <canvas id="canvas-particles" aria-hidden="true"></canvas>
+
+  <!-- Custom glowing cursor + trailing butterfly (desktop only, JS toggles) -->
+  <div id="glow-cursor" aria-hidden="true"></div>
+  <div id="cursor-butterfly" aria-hidden="true">🦋</div>
+
+  <!-- Clickable moon easter egg, fixed within the hero starfield -->
+  <button id="moon" class="moon-easter-egg" aria-label="A little moon secret">🌙</button>
+
+  <!-- Toast used for every easter-egg / secret message -->
+  <div id="easter-toast" class="easter-toast" role="status" aria-live="polite"></div>
+
+  <!-- ======================================================
+       LOADING SCREEN
+       ====================================================== -->
+  <section id="loading-screen" class="loading-screen">
+    <div class="loading-frames" aria-hidden="true">
+      <span class="frame frame-1"></span>
+      <span class="frame frame-2"></span>
+      <span class="frame frame-3"></span>
+    </div>
+    <div class="heartbeat-wrap" aria-hidden="true">
+      <span class="heartbeat-heart">❤</span>
+    </div>
+    <p class="loading-text">Loading Memories<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       INTRO SCREEN
+       ====================================================== -->
+  <section id="intro-screen" class="intro-screen" aria-hidden="true">
+    <p class="intro-line" id="intro-line">I have something to show you&hellip;</p>
+    <button id="begin-btn" class="btn-glass begin-btn" aria-hidden="true">
+      <span>Click to Begin</span> <span aria-hidden="true">❤️</span>
+    </button>
+  </section>
+
+  <!-- ======================================================
+       MUSIC PLAYER (persistent, minimal, glassmorphic)
+       ====================================================== -->
+  <audio id="bg-music" loop preload="none">
+    <source src="assets/music/nuvvunte-chaale.mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="music-player" class="music-player" aria-hidden="true">
+    <button id="music-toggle" class="music-btn" aria-label="Play or pause music">
+      <span id="music-icon">♪</span>
+    </button>
+    <div class="music-info">
+      <span class="music-title">Nuvvunte Chaale</span>
+      <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" aria-label="Volume">
+    </div>
+    <button id="mute-toggle" class="music-btn" aria-label="Mute music">🔊</button>
+  </div>
+
+  <!-- ======================================================
+       MAIN STORY (hidden until "Begin" is clicked)
+       ====================================================== -->
+  <main id="story" class="story" aria-hidden="true">
+
+    <!-- ---------- HERO / OPENING TITLE ---------- -->
+    <header class="hero" id="hero">
+      <p class="eyebrow" data-aos="fade-up">a friendship day film</p>
+      <h1 class="hero-title" data-aos="fade-up" data-aos-delay="150">
+        For <span class="script-name">Roohiiiiiiiii</span>
+      </h1>
+      <p class="hero-sub" data-aos="fade-up" data-aos-delay="300">
+        every scene below actually happened.
+      </p>
+      <div class="scroll-cue" data-aos="fade-in" data-aos-delay="800" aria-hidden="true">
+        <span></span>
+        <p>scroll to begin</p>
+      </div>
+    </header>
+
+    <!-- The constellation thread: a glowing SVG line that draws itself
+         down the page as the visitor scrolls, tying every chapter together.
+         By Section 10 it resolves into a heart. This is the site's signature
+         visual motif. Path + heart drawn by script.js on scroll. -->
+    <svg id="constellation" class="constellation" aria-hidden="true">
+      <path id="constellation-path" class="constellation-path"></path>
+      <path id="constellation-heart" class="constellation-heart"></path>
+    </svg>
+
+    <!-- ================= SECTION 1 — THE FIRST MEETING ================= -->
+    <section class="chapter" id="chapter-1" data-chapter="01">
+      <div class="chapter-inner">
+        <span class="chapter-number" data-aos="fade-up">Chapter I</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">Our Story Began Here&hellip;</h2>
+        <div class="chapter-copy" data-aos="fade-up" data-aos-delay="200">
+          <p>We first met in Intermediate, at Narayana Junior College.</p>
+          <p>It was the very first day.</p>
+          <p>She was wearing a beautiful black and green combination dress.</p>
+          <p>That moment stayed in my heart forever.</p>
+          <p class="emphasis">Little did I know that the girl I saw that day would become the most important person in my life.</p>
+        </div>
+      </div>
+      <!-- ambient floating butterflies local to this chapter -->
+      <div class="chapter-butterflies" aria-hidden="true">
+        <span class="drift-butterfly">🦋</span>
+        <span class="drift-butterfly">🦋</span>
+        <span class="drift-butterfly">🦋</span>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 2 — FIRST IMPRESSION ================= -->
+    <section class="chapter chapter-dark" id="chapter-2" data-chapter="02">
+      <div class="chapter-inner">
+        <span class="chapter-number" data-aos="fade-up">Chapter II</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">The Girl Named Aaliya&hellip;</h2>
+        <!-- Typewriter target: script.js types these lines in one at a time -->
+        <div class="typewriter-block" id="typewriter-2" data-lines='[
+            "Even before I spoke to her...",
+            "I had already fallen in love with her name.",
+            "\u201cAaliya.\u201d",
+            "I have always loved that name.",
+            "I thought,",
+            "\u201cShe\u2019ll probably never talk to me.\u201d",
+            "But fate had different plans.",
+            "Even though I already knew her name...",
+            "I kept asking...",
+            "\u201cWhat\u2019s your name?\u201d",
+            "Again.",
+            "And again.",
+            "Maybe five times.",
+            "Not because I didn\u2019t know...",
+            "But because I wanted to hear her cute voice.",
+            "That innocent smile...",
+            "That kind heart...",
+            "I\u2019ve never met someone so pure.",
+            "Maybe that\u2019s why she gets hurt easily...",
+            "Because beautiful hearts are always soft."
+          ]'>
+          <p class="typewriter-line" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 3 — HOW WE BECAME BEST FRIENDS ================= -->
+    <section class="chapter" id="chapter-3" data-chapter="03">
+      <div class="chapter-inner">
+        <span class="chapter-number" data-aos="fade-up">Chapter III</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">Maybe It Was Fate&hellip;</h2>
+        <div class="chapter-copy" data-aos="fade-up" data-aos-delay="200">
+          <p>I don't remember the exact date.</p>
+          <p>I don't remember how it happened.</p>
+          <p>We just became inseparable.</p>
+          <p>During our Intermediate days&mdash; especially during the Betterment period&mdash; we became so close.</p>
+          <p>One day, without saying anything, we both knew.</p>
+          <p class="emphasis">"She's my best friend."</p>
+          <p>Sometimes friendships don't need a beginning. They simply happen.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 4 — THE MISUNDERSTANDINGS ================= -->
+    <section class="chapter chapter-storm" id="chapter-4" data-chapter="04">
+      <!-- storm particles: soft rain-like petals rendered via canvas-particles when this section is active -->
+      <div class="chapter-inner">
+        <span class="chapter-number" data-aos="fade-up">Chapter IV</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">The Storm That Made Us Stronger</h2>
+        <div class="chapter-copy" data-aos="fade-up" data-aos-delay="200">
+          <p>Our second year wasn't perfect.</p>
+          <p>We had misunderstandings. We fought. We got hurt.</p>
+          <p>But every misunderstanding only brought us closer.</p>
+          <p>Those difficult moments taught us how much we truly mattered to each other.</p>
+          <p class="emphasis">Sometimes, the strongest friendships are built after surviving the hardest days.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 5 — EAMCET DAYS ================= -->
+    <section class="chapter" id="chapter-5" data-chapter="05">
+      <div class="chapter-inner">
+        <span class="chapter-number" data-aos="fade-up">Chapter V</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">EAMCET Days</h2>
+        <div class="chapter-copy" data-aos="fade-up" data-aos-delay="200">
+          <p>Those were some of the happiest days of my life.</p>
+          <p>I don't think anyone could have been happier than we were.</p>
+          <p>Then one thought scared me &mdash; <em>"What if B.Tech separates us?"</em></p>
+          <p>I cried. Because I couldn't imagine life without her.</p>
+          <p>But once again, fate smiled at us.</p>
+          <p>We both joined the same engineering college. Different branches. Same campus.</p>
+          <p>Seeing her even once a day became enough to make my whole day better.</p>
+          <p class="emphasis">And now, I have one wish. Dear God&mdash; please let us work in the same company someday. That is all I ask.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 6 — THE MOST PRECIOUS MEMORY ================= -->
+    <section class="chapter chapter-ticket" id="chapter-6" data-chapter="06">
+      <div class="chapter-inner">
+        <span class="chapter-number" data-aos="fade-up">Chapter VI</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">The Day I'll Never Forget</h2>
+
+        <!-- Movie-ticket styled memory card -->
+        <div class="movie-ticket" data-aos="zoom-in" data-aos-delay="200">
+          <div class="ticket-stub">
+            <span class="stub-label">ADMIT</span>
+            <span class="stub-two">TWO</span>
+            <span class="stub-icon">🎬</span>
+          </div>
+          <div class="ticket-main">
+            <p class="ticket-eyebrow">first movie together</p>
+            <p class="ticket-copy">My favorite memory will always be the first time I took you outside. And the fact that your first movie was with me&hellip; makes that day priceless.</p>
+            <p class="ticket-copy">I'll never forget your eyes. The happiness in them&mdash; no words can ever explain it.</p>
+            <p class="ticket-copy">Watching you smile that day made me happier than anything else.</p>
+            <p class="ticket-quote">Sometimes happiness isn't a place. It's a person. And for me, that person is you.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 7 — PHOTO GALLERY ================= -->
+    <section class="chapter chapter-gallery" id="chapter-7" data-chapter="07">
+      <div class="chapter-inner chapter-inner-wide">
+        <span class="chapter-number" data-aos="fade-up">Chapter VII</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">Our Beautiful Memories</h2>
+
+        <div class="gallery-grid" id="gallery-grid">
+          <!-- 8 gallery items, generated statically; captions read by script.js -->
+          <button class="gallery-item" data-aos="fade-up" data-aos-delay="0"   data-caption="The day fate introduced me to my forever person.">
+            <img src="assets/images/photo1.jpg" alt="Memory one with Roohiiiiiiiii" loading="lazy">
+          </button>
+          <button class="gallery-item" data-aos="fade-up" data-aos-delay="60"  data-caption="From strangers to the most beautiful chapter of my life.">
+            <img src="assets/images/photo2.jpg" alt="Memory two with Roohiiiiiiiii" loading="lazy">
+          </button>
+          <button class="gallery-item" data-aos="fade-up" data-aos-delay="120" data-caption="Every smile with you became my favorite memory.">
+            <img src="assets/images/photo3.jpg" alt="Memory three with Roohiiiiiiiii" loading="lazy">
+          </button>
+          <button class="gallery-item" data-aos="fade-up" data-aos-delay="180" data-caption="The first time I took you out... a memory I'll treasure forever.">
+            <img src="assets/images/photo4.jpg" alt="Memory four with Roohiiiiiiiii" loading="lazy">
+          </button>
+          <button class="gallery-item" data-aos="fade-up" data-aos-delay="0"   data-caption="Your smile is my favorite place in the whole world.">
+            <img src="assets/images/photo5.jpg" alt="Memory five with Roohiiiiiiiii" loading="lazy">
+          </button>
+          <button class="gallery-item" data-aos="fade-up" data-aos-delay="60"  data-caption="Every photo holds a story, but every story begins with you.">
+            <img src="assets/images/photo6.jpg" alt="Memory six with Roohiiiiiiiii" loading="lazy">
+          </button>
+          <button class="gallery-item" data-aos="fade-up" data-aos-delay="120" data-caption="No matter how many memories we make, I'll always want one more with you.">
+            <img src="assets/images/photo7.jpg" alt="Memory seven with Roohiiiiiiiii" loading="lazy">
+          </button>
+          <button class="gallery-item" data-aos="fade-up" data-aos-delay="180" data-caption="Forever grateful that fate chose you to be my best friend.">
+            <img src="assets/images/photo8.jpg" alt="Memory eight with Roohiiiiiiiii" loading="lazy">
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fullscreen lightbox for gallery -->
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+      <button id="lightbox-close" class="lightbox-close" aria-label="Close photo">&times;</button>
+      <img id="lightbox-img" src="" alt="">
+      <p id="lightbox-caption" class="lightbox-caption"></p>
+    </div>
+
+    <!-- ================= SECTION 8 — THINGS I LOVE ABOUT YOU ================= -->
+    <section class="chapter chapter-cards" id="chapter-8" data-chapter="08">
+      <div class="chapter-inner chapter-inner-wide">
+        <span class="chapter-number" data-aos="fade-up">Chapter VIII</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">Everything About You</h2>
+
+        <div class="love-grid">
+          <div class="love-card" data-aos="fade-up" data-aos-delay="0">❤️ The way you laugh.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="60">❤️ The way you call my name.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="120">❤️ The way you get angry at me.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="180">❤️ The way you care for me.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="0">❤️ Your cute voice.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="60">❤️ Your expressions.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="120">❤️ Your little habits.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="180">❤️ Your smile.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="0">❤️ The tiny details you always remember.</div>
+          <div class="love-card" data-aos="fade-up" data-aos-delay="60">❤️ Everything.</div>
+        </div>
+
+        <p class="love-final" data-aos="zoom-in">Your smile has the magical power to make me smile instantly.</p>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 9 — SECRET LETTER ================= -->
+    <section class="chapter chapter-letter" id="chapter-9" data-chapter="09">
+      <div class="chapter-inner">
+        <span class="chapter-number" data-aos="fade-up">Chapter IX</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">A Secret, Just For You</h2>
+
+        <div class="envelope-wrap" data-aos="zoom-in" data-aos-delay="200">
+          <button id="envelope" class="envelope" aria-label="Open the secret letter">
+            <span class="envelope-flap"></span>
+            <span class="envelope-body"></span>
+            <span class="envelope-seal">❤</span>
+          </button>
+          <p class="envelope-hint" id="envelope-hint">tap to open</p>
+        </div>
+
+        <div class="letter" id="letter" aria-hidden="true">
+          <div class="letter-paper">
+            <p>My Dearest Roohiiiiiiiii,</p>
+            <p>Remember one thing, thalli&hellip;</p>
+            <p>Always be happy. Never change yourself for anyone.</p>
+            <p>I know how strong you are. Don't let every small thing hurt your heart.</p>
+            <p>People who are meant to stay&mdash; will stay.<br>People who are meant to leave&mdash; will leave.</p>
+            <p>Whenever you're sad&hellip; whenever you need someone&hellip; whenever life feels heavy&hellip; never forget&hellip;</p>
+            <p class="emphasis">Your Sirisha is always here.</p>
+            <p>Take care of yourself. Do what makes YOU happy. Live the way YOU want.</p>
+            <p>No one's opinion is more important than your peace.</p>
+            <p>I'll always believe in you. Never lose yourself. Never forget me.</p>
+            <p>You're one of the most important people in my life.</p>
+            <p class="letter-signoff">Love you, Siri.<br>Happy Friendship Day, Nannaluuuu ❤️🫂</p>
+          </div>
+          <!-- soft falling petals rendered here on open -->
+          <div class="letter-petals" id="letter-petals" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 10 — FINAL SURPRISE ================= -->
+    <section class="chapter chapter-finale" id="chapter-10" data-chapter="10">
+      <div class="chapter-inner">
+        <span class="chapter-number" data-aos="fade-up">Final Chapter</span>
+        <h2 class="chapter-title" data-aos="fade-up" data-aos-delay="100">One Last Surprise</h2>
+
+        <button id="surprise-btn" class="btn-glass surprise-btn" data-aos="zoom-in" data-aos-delay="200">
+          <span>Click For Your Surprise</span> <span aria-hidden="true">❤️</span>
+        </button>
+
+        <div class="finale-text" id="finale-text" aria-live="polite">
+          <p class="finale-line" id="finale-line-1"></p>
+          <p class="finale-line finale-signoff" id="finale-line-2"></p>
+          <p class="finale-line finale-emoji" id="finale-line-3"></p>
+        </div>
+      </div>
+
+      <!-- fireworks render onto this canvas during the finale -->
+      <canvas id="canvas-fireworks" aria-hidden="true"></canvas>
+    </section>
+
+    <!-- ---------- FOOTER / CREDITS ---------- -->
+    <footer class="site-footer">
+      <p>handcrafted with ❤️ by <span class="script-name small">Ur Shershaaaaaa</span></p>
+      <p class="footer-sub">for Roohiiiiiiiii &mdash; happy friendship day</p>
+    </footer>
+
+  </main>
+
+  <!-- ============ SCRIPTS ============ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

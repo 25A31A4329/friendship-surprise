@@ -1,0 +1,1013 @@
+/* ============================================================
+   OUR STORY — stylesheet
+   A cinematic Friendship Day film for Roohiiiiiiiii.
+
+   TABLE OF CONTENTS
+   1.  Design tokens (palette / type / spacing)
+   2.  Reset & base
+   3.  Ambient layers (sky, canvases, cursor, moon, toast)
+   4.  Loading screen
+   5.  Intro screen
+   6.  Music player
+   7.  Hero + constellation thread
+   8.  Chapter shell (shared)
+   9.  Chapter 1–5 (story prose, typewriter)
+   10. Chapter 6 (movie ticket)
+   11. Chapter 7 (gallery + lightbox)
+   12. Chapter 8 (love cards)
+   13. Chapter 9 (envelope + letter)
+   14. Chapter 10 (finale + fireworks canvas)
+   15. Footer
+   16. Utility / shared components (glass button, glow, etc.)
+   17. Responsive
+   18. Reduced motion
+   ============================================================ */
+
+
+/* ============================================================
+   1. DESIGN TOKENS
+   ============================================================ */
+:root{
+  /* ---- palette ---- */
+  --void:        #0c0618;   /* deepest night background */
+  --deep-purple: #1e0f3d;   /* base panel purple */
+  --lavender:    #b6a3e0;   /* soft accent */
+  --pink:        #ffb3d1;   /* soft pink accent */
+  --rose-gold:   #e8b4a6;   /* warm rose-gold */
+  --gold:        #f4d58d;   /* light gold shimmer */
+  --ivory:       #fdf9ff;   /* near-white text */
+
+  /* translucent variants used across glass surfaces */
+  --glass-fill:   rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-shadow: rgba(20, 6, 46, 0.55);
+
+  /* ---- type ---- */
+  --font-display: 'Playfair Display', serif;
+  --font-script:  'Great Vibes', cursive;
+  --font-body:    'Quicksand', sans-serif;
+
+  /* ---- spacing / rhythm ---- */
+  --chapter-pad-y: clamp(5rem, 12vw, 10rem);
+  --content-w: min(680px, 88vw);
+  --content-w-wide: min(1080px, 92vw);
+
+  /* ---- motion ---- */
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================
+   2. RESET & BASE
+   ============================================================ */
+*, *::before, *::after{ box-sizing: border-box; }
+
+html{
+  scroll-behavior: smooth;
+}
+
+body{
+  margin: 0;
+  min-height: 100vh;
+  background: var(--void);
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-weight: 400;
+  overflow-x: hidden;
+  cursor: none; /* replaced by custom glow cursor on desktop */
+}
+
+/* fall back to default cursor on touch devices (JS also toggles a class) */
+body.touch-device{ cursor: auto; }
+
+img{ max-width: 100%; display: block; }
+button{ font-family: inherit; cursor: pointer; }
+p{ margin: 0 0 0.9em; line-height: 1.75; }
+
+::selection{ background: var(--pink); color: var(--void); }
+
+/* ============================================================
+   3. AMBIENT LAYERS
+   ============================================================ */
+
+/* slow, breathing gradient — the "animated night sky" */
+.sky-gradient{
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255,179,209,0.16), transparent 55%),
+    radial-gradient(ellipse at 80% 75%, rgba(182,163,224,0.18), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(244,213,141,0.10), transparent 60%),
+    linear-gradient(160deg, #0c0618 0%, #1a0e33 45%, #200f45 75%, #150a2b 100%);
+  background-size: 200% 200%;
+  animation: sky-drift 26s ease-in-out infinite alternate;
+}
+@keyframes sky-drift{
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+#canvas-stars{
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+}
+#canvas-particles{
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+}
+#canvas-fireworks{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 1; pointer-events: none;
+}
+
+/* custom glowing cursor */
+#glow-cursor{
+  position: fixed;
+  top: 0; left: 0;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,220,240,0.9), rgba(244,213,141,0.25) 60%, transparent 70%);
+  box-shadow: 0 0 18px 4px rgba(255,179,209,0.55);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease, width 0.2s ease, height 0.2s ease;
+  will-change: left, top;
+}
+#glow-cursor.hidden{ opacity: 0; }
+#glow-cursor.pressed{ width: 14px; height: 14px; }
+
+#cursor-butterfly{
+  position: fixed;
+  top: 0; left: 0;
+  font-size: 1.1rem;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 6px rgba(255,179,209,0.6));
+  transition: opacity 0.3s ease;
+}
+#cursor-butterfly.hidden{ opacity: 0; }
+
+/* clickable moon easter egg */
+.moon-easter-egg{
+  position: fixed;
+  top: clamp(1.2rem, 4vw, 2.5rem);
+  right: clamp(1.2rem, 4vw, 3rem);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  background: none;
+  border: none;
+  z-index: 30;
+  filter: drop-shadow(0 0 14px rgba(244,213,141,0.65));
+  animation: moon-glow 5s ease-in-out infinite;
+  transition: transform 0.4s var(--ease-cinematic);
+}
+.moon-easter-egg:hover{ transform: scale(1.15) rotate(8deg); }
+@keyframes moon-glow{
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(244,213,141,0.5)); }
+  50%      { filter: drop-shadow(0 0 20px rgba(244,213,141,0.85)); }
+}
+
+/* shared toast for easter eggs / secret messages */
+.easter-toast{
+  position: fixed;
+  left: 50%;
+  bottom: 6%;
+  transform: translate(-50%, 20px);
+  padding: 0.85em 1.6em;
+  border-radius: 999px;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 30px var(--glass-shadow);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 200;
+  transition: opacity 0.5s var(--ease-cinematic), transform 0.5s var(--ease-cinematic);
+}
+.easter-toast.visible{
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ============================================================
+   4. LOADING SCREEN
+   ============================================================ */
+.loading-screen{
+  position: fixed; inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  background: var(--void);
+  transition: opacity 0.9s var(--ease-cinematic), visibility 0.9s;
+}
+.loading-screen.fade-out{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-frames{
+  display: flex;
+  gap: 0.6rem;
+}
+.frame{
+  width: 34px; height: 46px;
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  background: linear-gradient(160deg, rgba(255,179,209,0.15), rgba(182,163,224,0.1));
+  box-shadow: 0 0 14px rgba(244,213,141,0.35);
+  animation: frame-float 2.4s ease-in-out infinite;
+}
+.frame-2{ animation-delay: 0.25s; }
+.frame-3{ animation-delay: 0.5s; }
+@keyframes frame-float{
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.65; }
+  50%      { transform: translateY(-10px) rotate(-3deg); opacity: 1; }
+}
+
+.heartbeat-wrap{ position: relative; }
+.heartbeat-heart{
+  font-size: 1.8rem;
+  color: var(--pink);
+  display: inline-block;
+  animation: heartbeat 1.1s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255,179,209,0.7));
+}
+@keyframes heartbeat{
+  0%, 100% { transform: scale(1); }
+  20%      { transform: scale(1.25); }
+  40%      { transform: scale(1); }
+  60%      { transform: scale(1.18); }
+}
+
+.loading-text{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  color: var(--lavender);
+}
+.dots span{
+  animation: dot-blink 1.4s infinite;
+  opacity: 0;
+}
+.dots span:nth-child(2){ animation-delay: 0.2s; }
+.dots span:nth-child(3){ animation-delay: 0.4s; }
+@keyframes dot-blink{
+  0%, 20%  { opacity: 0; }
+  50%      { opacity: 1; }
+  100%     { opacity: 0; }
+}
+
+.progress-track{
+  width: min(260px, 60vw);
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  overflow: hidden;
+}
+.progress-fill{
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--pink), var(--gold));
+  box-shadow: 0 0 12px rgba(255,179,209,0.7);
+  transition: width 0.25s ease-out;
+}
+
+/* ============================================================
+   5. INTRO SCREEN
+   ============================================================ */
+.intro-screen{
+  position: fixed; inset: 0;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  background: #000;
+  text-align: center;
+  padding: 0 1.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.2s ease, visibility 1.2s;
+}
+.intro-screen.active{
+  opacity: 1;
+  visibility: visible;
+}
+.intro-screen.fade-out{
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.4s var(--ease-cinematic), visibility 1.4s;
+}
+
+.intro-line{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.3rem, 4vw, 2.1rem);
+  color: var(--ivory);
+  max-width: 20ch;
+  opacity: 0;
+  letter-spacing: 0.02em;
+}
+.intro-line.reveal{
+  animation: intro-fade 2.4s var(--ease-cinematic) forwards;
+}
+@keyframes intro-fade{
+  0%   { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+  100% { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+
+.begin-btn{
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 1s var(--ease-cinematic), transform 1s var(--ease-cinematic);
+}
+.begin-btn.reveal{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ============================================================
+   6. MUSIC PLAYER
+   ============================================================ */
+.music-player{
+  position: fixed;
+  bottom: clamp(1rem, 3vw, 1.6rem);
+  left: clamp(1rem, 3vw, 1.6rem);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55em 0.9em;
+  border-radius: 999px;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 10px 30px var(--glass-shadow);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.music-player.visible{ opacity: 1; transform: translateY(0); }
+
+.music-btn{
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.08);
+  color: var(--ivory);
+  font-size: 1rem;
+  display: grid;
+  place-items: center;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.music-btn:hover{ background: rgba(255,255,255,0.18); transform: scale(1.08); }
+
+.music-info{
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 108px;
+}
+.music-title{
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--lavender);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#volume-slider{
+  width: 100%;
+  accent-color: var(--pink);
+  height: 3px;
+}
+
+/* ============================================================
+   7. HERO + CONSTELLATION THREAD
+   ============================================================ */
+.story{
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease-cinematic);
+}
+.story.visible{ opacity: 1; }
+
+.hero{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+}
+.eyebrow{
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.7rem;
+  color: var(--gold);
+  margin-bottom: 1.2rem;
+}
+.hero-title{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 7vw, 4.6rem);
+  line-height: 1.1;
+  margin: 0 0 1rem;
+  color: var(--ivory);
+}
+.script-name{
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 1.25em;
+  background: linear-gradient(100deg, var(--pink), var(--gold) 55%, var(--rose-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 22px rgba(255,179,209,0.35));
+}
+.script-name.small{ font-size: 1.4rem; }
+
+.hero-sub{
+  color: var(--lavender);
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  letter-spacing: 0.02em;
+  max-width: 32ch;
+}
+
+.scroll-cue{
+  position: absolute;
+  bottom: 2.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.scroll-cue span{
+  width: 1px; height: 34px;
+  background: linear-gradient(var(--gold), transparent);
+  animation: scroll-cue-move 1.8s ease-in-out infinite;
+}
+.scroll-cue p{
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--lavender);
+}
+@keyframes scroll-cue-move{
+  0%, 100% { opacity: 0.3; transform: scaleY(0.7); transform-origin: top; }
+  50%      { opacity: 1;   transform: scaleY(1);   transform-origin: top; }
+}
+
+/* constellation thread: fixed full-height SVG overlay, path drawn via JS
+   using stroke-dasharray/offset tied to scroll progress */
+.constellation{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.constellation-path{
+  fill: none;
+  stroke: url(#thread-gradient);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(255,179,209,0.55));
+}
+.constellation-heart{
+  fill: none;
+  stroke: url(#thread-gradient);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0;
+  filter: drop-shadow(0 0 10px rgba(255,179,209,0.75));
+  transition: opacity 1.2s var(--ease-cinematic);
+}
+.constellation-heart.visible{ opacity: 1; }
+
+/* ============================================================
+   8. CHAPTER SHELL (shared across sections 1–10)
+   ============================================================ */
+.chapter{
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--chapter-pad-y) 1.5rem;
+  overflow: hidden;
+}
+.chapter-inner{
+  position: relative;
+  z-index: 2;
+  width: var(--content-w);
+  text-align: center;
+}
+.chapter-inner-wide{ width: var(--content-w-wide); }
+
+.chapter-dark::before{
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(30,15,61,0.55), rgba(12,6,24,0.85));
+  z-index: 0;
+}
+
+.chapter-number{
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--gold);
+  margin-bottom: 1.1rem;
+}
+.chapter-title{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 5vw, 3.1rem);
+  margin: 0 0 1.8rem;
+  line-height: 1.2;
+  color: var(--ivory);
+}
+.chapter-copy p{
+  color: rgba(253, 249, 255, 0.86);
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+}
+.chapter-copy .emphasis{
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--pink);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  margin-top: 1.4rem;
+}
+
+/* ambient drifting butterflies confined to a chapter */
+.chapter-butterflies{
+  position: absolute; inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.drift-butterfly{
+  position: absolute;
+  font-size: 1.4rem;
+  opacity: 0.75;
+  animation: drift 12s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255,179,209,0.4));
+}
+.drift-butterfly:nth-child(1){ top: 20%; left: 8%;  animation-duration: 14s; }
+.drift-butterfly:nth-child(2){ top: 65%; left: 85%; animation-duration: 16s; animation-delay: -4s; }
+.drift-butterfly:nth-child(3){ top: 40%; left: 50%; animation-duration: 11s; animation-delay: -7s; }
+@keyframes drift{
+  0%   { transform: translate(0,0) rotate(0deg); }
+  25%  { transform: translate(30px,-40px) rotate(8deg); }
+  50%  { transform: translate(-20px,-70px) rotate(-6deg); }
+  75%  { transform: translate(-40px,-20px) rotate(4deg); }
+  100% { transform: translate(0,0) rotate(0deg); }
+}
+
+/* soft downward petal-rain used behind the "storm" chapter */
+.chapter-storm::before{
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(182,163,224,0.18), transparent 60%);
+  z-index: 0;
+}
+
+/* ============================================================
+   9. TYPEWRITER (Chapter 2)
+   ============================================================ */
+.typewriter-block{
+  min-height: 3.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.typewriter-line{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+  color: var(--ivory);
+  border-right: 2px solid var(--gold);
+  padding-right: 6px;
+  white-space: pre-wrap;
+  min-height: 1.4em;
+}
+
+/* ============================================================
+   10. CHAPTER 6 — MOVIE TICKET
+   ============================================================ */
+.movie-ticket{
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 640px;
+  margin: 0 auto;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 20px 60px var(--glass-shadow);
+  text-align: left;
+}
+.ticket-stub{
+  flex: 0 0 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem 0.5rem;
+  background: linear-gradient(180deg, rgba(232,180,166,0.25), rgba(244,213,141,0.12));
+  border-right: 2px dashed rgba(255,255,255,0.25);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+.stub-label{ font-weight: 700; letter-spacing: 0.2em; font-size: 0.75rem; color: var(--gold); }
+.stub-two{ font-family: var(--font-display); font-style: italic; color: var(--pink); }
+.stub-icon{ writing-mode: horizontal-tb; font-size: 1.4rem; }
+
+.ticket-main{
+  flex: 1 1 320px;
+  padding: 1.8rem 1.8rem 1.8rem 1.6rem;
+}
+.ticket-eyebrow{
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.68rem;
+  color: var(--lavender);
+  margin-bottom: 0.8rem;
+}
+.ticket-copy{ color: rgba(253,249,255,0.88); font-size: 0.98rem; }
+.ticket-quote{
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--pink);
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+/* ============================================================
+   11. CHAPTER 7 — GALLERY + LIGHTBOX
+   ============================================================ */
+.gallery-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.9rem;
+}
+.gallery-item{
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(160deg, rgba(182,163,224,0.15), rgba(255,179,209,0.08));
+  padding: 0;
+  transition: transform 0.4s var(--ease-cinematic), box-shadow 0.4s var(--ease-cinematic);
+}
+.gallery-item img{
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-cinematic);
+}
+.gallery-item:hover{
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(20,6,46,0.6);
+}
+.gallery-item:hover img{ transform: scale(1.08); }
+
+.lightbox{
+  position: fixed; inset: 0;
+  z-index: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: rgba(8, 4, 16, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.45s var(--ease-cinematic), visibility 0.45s;
+}
+.lightbox.active{ opacity: 1; visibility: visible; }
+.lightbox img{
+  max-width: min(560px, 90vw);
+  max-height: 65vh;
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  transform: scale(0.85);
+  transition: transform 0.5s var(--ease-cinematic);
+}
+.lightbox.active img{ transform: scale(1); }
+.lightbox-caption{
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ivory);
+  text-align: center;
+  max-width: 46ch;
+  font-size: 1.05rem;
+}
+.lightbox-close{
+  position: absolute;
+  top: 1.4rem; right: 1.6rem;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--ivory);
+  font-size: 1.5rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* ============================================================
+   12. CHAPTER 8 — LOVE CARDS
+   ============================================================ */
+.love-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.4rem;
+}
+.love-card{
+  padding: 1.4rem 1.1rem;
+  border-radius: 16px;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 0.95rem;
+  color: var(--ivory);
+  text-align: left;
+  box-shadow: 0 12px 30px rgba(20,6,46,0.35);
+  transition: transform 0.4s var(--ease-cinematic), box-shadow 0.4s var(--ease-cinematic);
+}
+.love-card:hover{
+  transform: translateY(-5px);
+  box-shadow: 0 18px 40px rgba(255,179,209,0.18);
+}
+.love-final{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  color: var(--pink);
+  max-width: 34ch;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   13. CHAPTER 9 — ENVELOPE + LETTER
+   ============================================================ */
+.envelope-wrap{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.envelope{
+  position: relative;
+  width: 180px;
+  height: 120px;
+  background: linear-gradient(160deg, rgba(232,180,166,0.35), rgba(182,163,224,0.2));
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: 0 20px 50px rgba(20,6,46,0.5), 0 0 30px rgba(244,213,141,0.15);
+  transition: transform 0.4s var(--ease-cinematic);
+}
+.envelope:hover{ transform: translateY(-4px) scale(1.02); }
+.envelope-flap{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(255,179,209,0.35), rgba(244,213,141,0.2));
+  clip-path: polygon(0 0, 50% 55%, 100% 0);
+  transform-origin: top;
+  transition: transform 0.6s var(--ease-cinematic);
+  border-radius: 10px 10px 0 0;
+}
+.envelope.open .envelope-flap{ transform: rotateX(180deg); }
+.envelope-body{
+  position: absolute; inset: 0;
+  border-radius: 10px;
+}
+.envelope-seal{
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--pink);
+  font-size: 1.6rem;
+  filter: drop-shadow(0 0 10px rgba(255,179,209,0.8));
+  animation: heartbeat 2.2s ease-in-out infinite;
+  z-index: 2;
+}
+.envelope-hint{
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--lavender);
+}
+
+.letter{
+  max-width: 640px;
+  margin: 2rem auto 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 1s var(--ease-cinematic), opacity 1s var(--ease-cinematic);
+  position: relative;
+}
+.letter.open{
+  max-height: 2200px;
+  opacity: 1;
+}
+.letter-paper{
+  padding: clamp(1.6rem, 4vw, 2.6rem);
+  border-radius: 20px;
+  background: linear-gradient(170deg, rgba(255,255,255,0.08), rgba(182,163,224,0.06));
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  text-align: left;
+  box-shadow: 0 25px 60px rgba(20,6,46,0.5);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(0.98rem, 1.8vw, 1.15rem);
+  color: rgba(253,249,255,0.92);
+}
+.letter-paper .emphasis{ color: var(--pink); font-weight: 600; }
+.letter-signoff{ margin-top: 1.4rem; color: var(--gold); font-size: 1.1em; }
+
+.letter-petals{
+  position: absolute; inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ============================================================
+   14. CHAPTER 10 — FINALE
+   ============================================================ */
+.chapter-finale{
+  min-height: 100vh;
+}
+.surprise-btn{
+  margin-bottom: 2.4rem;
+}
+.finale-text{
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+}
+.finale-line{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+  color: var(--ivory);
+  max-width: 34ch;
+  opacity: 0;
+  white-space: pre-wrap;
+}
+.finale-signoff{ color: var(--pink); font-family: var(--font-script); font-size: 1.8rem; font-style: normal; }
+.finale-emoji{ font-size: 1.1rem; letter-spacing: 0.05em; }
+
+/* ============================================================
+   15. FOOTER
+   ============================================================ */
+.site-footer{
+  text-align: center;
+  padding: 3rem 1.5rem 4rem;
+  color: var(--lavender);
+  font-size: 0.85rem;
+  position: relative;
+  z-index: 1;
+}
+.footer-sub{ color: rgba(182,163,224,0.6); font-size: 0.75rem; margin-top: 0.3rem; }
+
+/* ============================================================
+   16. SHARED COMPONENTS
+   ============================================================ */
+
+/* glassmorphic pill button used for "Begin" and "Surprise" CTAs */
+.btn-glass{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9em 2.1em;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  box-shadow: 0 12px 34px var(--glass-shadow);
+  transition: transform 0.35s var(--ease-cinematic), box-shadow 0.35s var(--ease-cinematic), background 0.35s;
+}
+.btn-glass:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 18px 46px rgba(255,179,209,0.28), 0 0 0 1px rgba(255,179,209,0.3);
+  background: rgba(255,255,255,0.1);
+}
+.btn-glass:active{ transform: translateY(-1px) scale(0.98); }
+
+/* ripple effect element injected by script.js on click */
+.ripple{
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  transform: scale(0);
+  animation: ripple-anim 0.7s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ripple-anim{
+  to{ transform: scale(3.2); opacity: 0; }
+}
+
+/* generic fade-petal used by letter + finale confetti-like elements */
+.petal{
+  position: absolute;
+  top: -20px;
+  font-size: 1.1rem;
+  animation: petal-fall linear forwards;
+  pointer-events: none;
+}
+@keyframes petal-fall{
+  to{ transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+/* ============================================================
+   17. RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px){
+  .gallery-grid{ grid-template-columns: repeat(3, 1fr); }
+  .love-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px){
+  :root{ --chapter-pad-y: 4.5rem; }
+  .gallery-grid{ grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .love-grid{ grid-template-columns: 1fr 1fr; }
+  .movie-ticket{ flex-direction: column; }
+  .ticket-stub{
+    flex-direction: row;
+    writing-mode: horizontal-tb;
+    border-right: none;
+    border-bottom: 2px dashed rgba(255,255,255,0.25);
+    padding: 1rem;
+  }
+  .stub-icon{ writing-mode: horizontal-tb; }
+  .music-player{ padding: 0.5em 0.7em; }
+  .music-info{ min-width: 84px; }
+  #glow-cursor, #cursor-butterfly{ display: none; }
+  body{ cursor: auto; }
+}
+
+@media (max-width: 420px){
+  .love-grid{ grid-template-columns: 1fr; }
+  .gallery-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================================
+   18. REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
